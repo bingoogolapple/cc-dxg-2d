@@ -1,0 +1,34 @@
+{
+  "version": "1.4.0",
+  "configurations": [
+    {
+      "name": "Creator Debug: Launch Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:7456",
+      "sourceMaps": true,
+      "userDataDir": "${workspaceFolder}/.vscode/chrome",
+      "diagnosticLogging": false,
+      "pathMapping": {
+        "/preview-scripts/assets": "${workspaceFolder}/temp/quick-scripts/dst/assets",
+        "/": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "autorefresh",
+      "request": "launch",
+      "type": "node",
+      "runtimeExecutable": "nodemon",
+      "args": [
+        "--watch",
+        "assets/script",
+        "--ext",
+        "js ts",
+        "--exec",
+        "curl http://localhost:7456/update-db"
+      ],
+      "console": "integratedTerminal",
+      "protocol": "inspector"
+    }
+  ]
+}

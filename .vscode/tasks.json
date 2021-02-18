@@ -1,0 +1,38 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "compile",
+      "command": "curl",
+      "args": ["http://localhost:7456/update-db"],
+      "type": "shell",
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "reveal": "always"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "autorefresh",
+      "type": "shell",
+      "command": "nodemon",
+      "args": [
+        "--watch",
+        "assets/script",
+        "--ext",
+        "js ts",
+        "--exec",
+        "curl http://localhost:7456/update-db"
+      ],
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "reveal": "always"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
