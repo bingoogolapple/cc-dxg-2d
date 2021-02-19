@@ -538,11 +538,11 @@ export default class Game extends cc.Component {
       if (this.gameMode == GameMode.WATERMELON) {
         this.gameMode = GameMode.SESAME
         this.switchGameModeLabel.string = "大西瓜"
-        this.titleLabel.string = "合成小芝麻"
+        this.titleLabel.string = "智能版合成小芝麻"
       } else {
         this.gameMode = GameMode.WATERMELON
         this.switchGameModeLabel.string = "小芝麻"
-        this.titleLabel.string = "合成大西瓜"
+        this.titleLabel.string = "智能版合成大西瓜"
       }
       this.unscheduleAllCallbacks()
       this.stopAI()

@@ -97,6 +97,9 @@
       },
       {
         "__id__": 89
+      },
+      {
+        "__id__": 90
       }
     ],
     "_prefab": null,
@@ -420,7 +423,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 150,
+      "width": 240,
       "height": 37.8
     },
     "_anchorPoint": {
@@ -432,7 +435,7 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -265,
+        -220,
         191.1,
         0,
         0,
@@ -472,8 +475,8 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_string": "合成大西瓜",
-    "_N$string": "合成大西瓜",
+    "_string": "智能版合成大西瓜",
+    "_N$string": "智能版合成大西瓜",
     "_fontSize": 30,
     "_lineHeight": 30,
     "_enableWrapText": true,
@@ -3838,5 +3841,15 @@
       "__uuid__": "12771289-44bc-44ab-8847-eade81ac7481"
     },
     "_id": "0en1FLRvBO9qpcvSypc8Ub"
+  },
+  {
+    "__type__": "17cd05k65xDKLE1ZUCfZ0KN",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 2
+    },
+    "_enabled": true,
+    "_id": "97BW7i7KVJxr60K5iM9i3G"
   }
 ]
