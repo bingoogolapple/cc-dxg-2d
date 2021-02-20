@@ -15,16 +15,16 @@ enum GameState {
 @ccclass
 export default class Game extends cc.Component {
   private static readonly COLOR_ARR: cc.Color[] = [
-    new cc.Color(110, 16, 100),
-    new cc.Color(255, 9, 36),
-    new cc.Color(253, 111, 1),
-    new cc.Color(255, 230, 23),
-    new cc.Color(93, 222, 31),
-    new cc.Color(229, 25, 50),
-    new cc.Color(245, 159, 98),
-    new cc.Color(255, 225, 69),
-    new cc.Color(205, 201, 189),
-    new cc.Color(248, 64, 100)
+    new cc.Color(249, 237, 223, 100),
+    new cc.Color(223, 201, 99, 100),
+    new cc.Color(191, 199, 81, 100),
+    new cc.Color(245, 66, 57, 100),
+    new cc.Color(198, 225, 72, 100),
+    new cc.Color(242, 250, 252, 100),
+    new cc.Color(244, 127, 60, 100),
+    new cc.Color(200, 169, 92, 100),
+    new cc.Color(242, 238, 235, 100),
+    new cc.Color(252, 74, 61, 100)
   ]
   private static readonly WATERMELON_ARR: number[] = [
     1,
@@ -538,11 +538,17 @@ export default class Game extends cc.Component {
       if (this.gameMode == GameMode.WATERMELON) {
         this.gameMode = GameMode.SESAME
         this.switchGameModeLabel.string = "大西瓜"
-        this.titleLabel.string = "智能版合成小芝麻"
+        this.titleLabel.string = this.titleLabel.string.replace(
+          "大西瓜",
+          "小芝麻"
+        )
       } else {
         this.gameMode = GameMode.WATERMELON
         this.switchGameModeLabel.string = "小芝麻"
-        this.titleLabel.string = "智能版合成大西瓜"
+        this.titleLabel.string = this.titleLabel.string.replace(
+          "小芝麻",
+          "大西瓜"
+        )
       }
       this.unscheduleAllCallbacks()
       this.stopAI()
