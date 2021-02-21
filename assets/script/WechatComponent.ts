@@ -70,13 +70,7 @@ export default class WechatComponent extends cc.Component {
       }
     })
     this.customAd.onLoad(() => this.log("原生模板广告加载成功"))
-    this.customAd.onError((err: any) => {
-      this.log("原生模板广告加载失败", err)
-      if (err.errCode == 1004) {
-        this.log("无合适的原生模板广告推荐，等 15s 再次推荐")
-        this.scheduleOnce(() => this.showSingleCustomAd(alignRight), 15)
-      }
-    })
+    this.customAd.onError((err: any) => this.log("原生模板广告加载失败", err))
     this.customAd.onClose(() => {
       this.log("原生模板广告关闭，等 15s 再次推荐")
       this.scheduleOnce(() => this.showSingleCustomAd(alignRight), 15)
@@ -239,16 +233,7 @@ export default class WechatComponent extends cc.Component {
     let ad = callback(screenWidth, screenHeight)
 
     ad.onLoad(() => this.log(desc, "广告加载成功"))
-    ad.onError((err: any) => {
-      this.log(desc, "广告加载失败", err)
-      if (err.errCode == 1004) {
-        this.log("无合适的广告推荐，等 15s 再次推荐")
-        this.scheduleOnce(
-          () => this.showFooterAd(desc, wx, originAd, callback),
-          15
-        )
-      }
-    })
+    ad.onError((err: any) => this.log(desc, "广告加载失败", err))
 
     ad.onResize((size: any) => {
       ad.style.left = (screenWidth - size.width) / 2

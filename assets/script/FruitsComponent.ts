@@ -16,7 +16,12 @@ export default class FruitsComponent extends cc.Component {
   // 超过警戒线后 update 方法执行次数
   private overCount: number = 0
 
-  init(fruitsIndex: number) {
+  initHero(fruitsIndex: number, frame: cc.SpriteFrame) {
+    this.fruitsIndex = fruitsIndex
+    this.node.getComponent(cc.Sprite).spriteFrame = frame
+  }
+
+  initFruit(fruitsIndex: number) {
     // 主动调用 init 时都是非顶部水果
     this.isHero = false
     // 使用了 NodePool 重复利用，这里需要重新初始化相关属性

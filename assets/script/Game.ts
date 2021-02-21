@@ -57,6 +57,13 @@ export default class Game extends cc.Component {
   private scoreLabel: cc.Label = null
 
   @property(cc.Node)
+  private hero1Node: cc.Node = null
+  @property(cc.Node)
+  private hero2Node: cc.Node = null
+  @property(cc.Node)
+  private hero3Node: cc.Node = null
+
+  @property(cc.Node)
   private heroNode: cc.Node = null
   @property(cc.Node)
   private warningLineNode: cc.Node = null
@@ -281,28 +288,101 @@ export default class Game extends cc.Component {
       return
     }
 
-    this.generateFruitsIndex()
+    let nextHeroContainerX = (this.hero1Node.parent.x =
+      cc.winSize.width / 2 - 140 / 2 - 10)
+    let isFirst: boolean = this.step == 0
+    if (isFirst) {
+      let index = this.generateFruitsIndex()
+      this.fruitsIndex = index
 
-    this.heroNode.getComponent(FruitsComponent).fruitsIndex = this.fruitsIndex
-    // 更新水果节点图片、尺寸等
-    this.heroNode.getComponent(cc.Sprite).spriteFrame = this.fruitsFrameArr[
-      this.fruitsIndex
-    ]
+      this.heroNode
+        .getComponent(FruitsComponent)
+        .initHero(index, this.fruitsFrameArr[index])
 
-    let fruitsSize = this.calculateFruitsSize(this.fruitsIndex)
-    this.heroNode.width = fruitsSize
-    this.heroNode.height = fruitsSize
-    this.heroNode.x = 0
-    if (this.gameMode == GameMode.WATERMELON) {
-      this.heroNode.y = cc.winSize.height / 2 - 80 - fruitsSize / 2
+      index = this.generateFruitsIndex()
+      this.hero1Node
+        .getComponent(FruitsComponent)
+        .initHero(index, this.fruitsFrameArr[index])
+      this.hero1Node.active = true
+
+      index = this.generateFruitsIndex()
+      this.hero2Node
+        .getComponent(FruitsComponent)
+        .initHero(index, this.fruitsFrameArr[index])
+      this.hero2Node.active = true
+
+      index = this.generateFruitsIndex()
+      this.hero3Node
+        .getComponent(FruitsComponent)
+        .initHero(index, this.fruitsFrameArr[index])
+      this.hero3Node.active = true
+
+      this.hero1Node.parent.x = nextHeroContainerX
+
+      // 展示主 hero 动画
+      let fruitsSize = this.calculateFruitsSize(this.fruitsIndex)
+      this.heroNode.width = fruitsSize
+      this.heroNode.height = fruitsSize
+      this.heroNode.x = 0
+      if (this.gameMode == GameMode.WATERMELON) {
+        this.heroNode.y = cc.winSize.height / 2 - 80 - fruitsSize / 2
+      } else {
+        this.heroNode.y = cc.winSize.height / 2 - 60 - fruitsSize / 2
+      }
+      this.heroNode.scale = 0.8
+      this.heroNode.active = true
+
+      // 从 0.8 缩放到 1
+      cc.tween(this.heroNode).to(0.2, { scale: 1 }).start()
     } else {
-      this.heroNode.y = cc.winSize.height / 2 - 60 - fruitsSize / 2
-    }
-    this.heroNode.scale = 0.8
-    this.heroNode.active = true
+      let index = this.hero1Node.getComponent(FruitsComponent).fruitsIndex
+      this.fruitsIndex = index
 
-    // 从 0.8 缩放到 1
-    cc.tween(this.heroNode).to(0.2, { scale: 1 }).start()
+      this.heroNode
+        .getComponent(FruitsComponent)
+        .initHero(index, this.fruitsFrameArr[index])
+
+      index = this.hero2Node.getComponent(FruitsComponent).fruitsIndex
+      this.hero1Node
+        .getComponent(FruitsComponent)
+        .initHero(index, this.fruitsFrameArr[index])
+
+      this.hero3Node.getComponent(FruitsComponent).fruitsIndex
+      this.hero2Node
+        .getComponent(FruitsComponent)
+        .initHero(index, this.fruitsFrameArr[index])
+
+      index = this.generateFruitsIndex()
+      this.hero3Node
+        .getComponent(FruitsComponent)
+        .initHero(index, this.fruitsFrameArr[index])
+
+      this.hero1Node.parent.x = nextHeroContainerX + 50
+      cc.tween(this.hero1Node.parent).to(0.2, { x: nextHeroContainerX }).start()
+
+      // 展示主 hero 动画
+      let fruitsSize = this.calculateFruitsSize(this.fruitsIndex)
+      this.heroNode.width = this.hero1Node.width
+      this.heroNode.height = this.hero1Node.height
+      this.heroNode.x =
+        cc.winSize.width / 2 -
+        this.hero1Node.parent.width +
+        this.hero1Node.width / 2
+      this.heroNode.y = this.hero1Node.parent.y
+
+      let y: number
+      if (this.gameMode == GameMode.WATERMELON) {
+        y = cc.winSize.height / 2 - 80 - fruitsSize / 2
+      } else {
+        y = cc.winSize.height / 2 - 60 - fruitsSize / 2
+      }
+      this.heroNode.scale = 1
+      this.heroNode.active = true
+
+      cc.tween(this.heroNode)
+        .to(0.2, { x: 0, y: y, width: fruitsSize, height: fruitsSize })
+        .start()
+    }
   }
 
   private generateFruitsIndex() {
@@ -313,14 +393,14 @@ export default class Game extends cc.Component {
       if (this.step <= 2) {
         index = 0
       }
-      this.fruitsIndex = Game.WATERMELON_ARR[index]
+      return Game.WATERMELON_ARR[index]
     } else {
       // 生成合成小芝麻索引
       let index = Math.floor(Math.random() * Game.SESAME_ARR.length)
       if (this.step <= 2) {
         index = 0
       }
-      this.fruitsIndex = Game.SESAME_ARR[index]
+      return Game.SESAME_ARR[index]
     }
   }
 
@@ -352,7 +432,7 @@ export default class Game extends cc.Component {
     fruitsNode.getComponent(cc.RigidBody).gravityScale = 4 + fruitsIndex * 0.5
     fruitsNode.getComponent(cc.PhysicsCircleCollider).radius = fruitsSize / 2
     let fruitsComponent = fruitsNode.getComponent(FruitsComponent)
-    fruitsComponent.init(fruitsIndex)
+    fruitsComponent.initFruit(fruitsIndex)
     fruitsNode.parent = this.node
 
     if (fruitsIndex === 0 || fruitsIndex === this.fruitsFrameArr.length - 1) {
@@ -504,6 +584,9 @@ export default class Game extends cc.Component {
 
     this.gameState = GameState.GAME_OVER
     this.heroNode.active = false
+    this.hero1Node.active = false
+    this.hero2Node.active = false
+    this.hero3Node.active = false
     this.warningLineNode.active = false
 
     // 所有水果节点播放爆炸动画并移除
