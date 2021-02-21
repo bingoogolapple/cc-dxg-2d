@@ -1,4 +1,5 @@
 import FruitsComponent from "./FruitsComponent"
+import WechatComponent from "./WechatComponent"
 
 const { ccclass, property } = cc._decorator
 
@@ -41,6 +42,11 @@ export default class Game extends cc.Component {
   private static readonly SESAME_ARR: number[] = [10, 9, 9, 8, 8, 8, 7, 7, 6, 6]
   static instance: Game = null
 
+  @property(cc.Node)
+  private bottomUpWallNode: cc.Node = null
+  @property(cc.Node)
+  private bottomDownWallNode: cc.Node = null
+
   @property(cc.Label)
   private switchGameModeLabel: cc.Label = null
   @property(cc.Label)
@@ -79,6 +85,8 @@ export default class Game extends cc.Component {
   private fruitsIndex: number = 1
   private score: number = 0
   private isAI: boolean = false
+
+  private wechatComponent: WechatComponent = null
 
   private aiFunc: Function = () => {
     this.heroNode.active = false
@@ -130,6 +138,10 @@ export default class Game extends cc.Component {
 
   onLoad() {
     Game.instance = this
+    this.wechatComponent = this.node.getComponent(WechatComponent)
+    this.wechatComponent.registFooterAdHeightUpdate(
+      this.onFooterAdHeightUpdated
+    )
 
     // 绑定触摸事件
     this.node.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this)
@@ -149,6 +161,14 @@ export default class Game extends cc.Component {
     this.node.off(cc.Node.EventType.TOUCH_MOVE, this.onTouchMove, this)
     this.node.off(cc.Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this)
     this.node.off(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this)
+  }
+
+  private onFooterAdHeightUpdated = (footerAdHeight: number) => {
+    this.log("底部广告高度发生变化")
+    this.bottomDownWallNode.height = footerAdHeight
+    this.bottomDownWallNode.y = -cc.winSize.height / 2 + footerAdHeight / 2
+    this.bottomUpWallNode.y =
+      -cc.winSize.height / 2 + footerAdHeight + this.bottomUpWallNode.height / 2
   }
 
   update(dt: number) {
@@ -323,6 +343,7 @@ export default class Game extends cc.Component {
     let fruitsSize = this.calculateFruitsSize(fruitsIndex)
     fruitsNode.width = fruitsSize
     fruitsNode.height = fruitsSize
+    fruitsNode.angle = 0
     fruitsNode.scale = 1
     fruitsNode.setPosition(position)
     fruitsNode.getComponent(cc.Sprite).spriteFrame = this.fruitsFrameArr[
@@ -592,21 +613,49 @@ export default class Game extends cc.Component {
       this.unscheduleAllCallbacks()
       this.stopAI()
       this.init()
+      this.wechatComponent.showInterstitialAd()
     } else if (data === "replay") {
       this.unscheduleAllCallbacks()
       this.stopAI()
       this.init()
+      this.wechatComponent.showInterstitialAd()
     } else if (data === "switchAI") {
-      this.unscheduleAllCallbacks()
       if (this.isAI) {
+        this.unscheduleAllCallbacks()
         this.stopAI()
         if (!this.heroNode.active) {
           this.showHero()
         }
       } else {
-        this.isAI = true
-        this.startAI()
+        if (this.wechatComponent.isWechat()) {
+          this.wechatComponent.showVideoAd({
+            onSuccess: () => {
+              this.log("播放完成，启动 AI")
+              this.startAiWithClick()
+            },
+            onFail: isUser => {
+              this.log("未播放完成，不启动 AI")
+              if (isUser) {
+                this.wechatComponent.showToast("播放 30 秒视频后才能启动 AI")
+              } else {
+                this.startAiWithClick()
+              }
+            }
+          })
+        } else {
+          this.startAiWithClick()
+        }
       }
     }
+  }
+
+  private startAiWithClick() {
+    this.unscheduleAllCallbacks()
+    this.isAI = true
+    this.startAI()
+  }
+
+  private log(...data: any[]): void {
+    // console.log(...data)
   }
 }
