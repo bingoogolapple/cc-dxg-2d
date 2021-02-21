@@ -423,7 +423,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 240,
+      "width": 150,
       "height": 37.8
     },
     "_anchorPoint": {
@@ -435,7 +435,7 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -220,
+        -265,
         191.1,
         0,
         0,
@@ -475,8 +475,8 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_string": "智能版合成大西瓜",
-    "_N$string": "智能版合成大西瓜",
+    "_string": "合成大水果",
+    "_N$string": "合成大水果",
     "_fontSize": 30,
     "_lineHeight": 30,
     "_enableWrapText": true,

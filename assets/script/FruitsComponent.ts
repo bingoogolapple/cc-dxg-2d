@@ -17,10 +17,16 @@ export default class FruitsComponent extends cc.Component {
   private overCount: number = 0
 
   init(fruitsIndex: number) {
+    // 主动调用 init 时都是非顶部水果
     this.isHero = false
+    // 使用了 NodePool 重复利用，这里需要重新初始化相关属性
+    this.isCollided = false
+    this.canCollision = true
+    this.overCount = 0
+
     this.fruitsIndex = fruitsIndex
     if (fruitsIndex <= 0 || fruitsIndex >= 11) {
-      // 小芝麻或大西瓜不处理碰撞检测
+      // 小芝麻或大水果不处理碰撞检测
       this.canCollision = false
     }
     this.getComponent(cc.PhysicsCircleCollider).tag =

@@ -15,16 +15,16 @@ enum GameState {
 @ccclass
 export default class Game extends cc.Component {
   private static readonly COLOR_ARR: cc.Color[] = [
-    new cc.Color(249, 237, 223, 100),
-    new cc.Color(223, 201, 99, 100),
-    new cc.Color(191, 199, 81, 100),
-    new cc.Color(245, 66, 57, 100),
-    new cc.Color(198, 225, 72, 100),
-    new cc.Color(242, 250, 252, 100),
-    new cc.Color(244, 127, 60, 100),
-    new cc.Color(200, 169, 92, 100),
-    new cc.Color(242, 238, 235, 100),
-    new cc.Color(252, 74, 61, 100)
+    new cc.Color(249, 237, 223),
+    new cc.Color(223, 201, 99),
+    new cc.Color(191, 199, 81),
+    new cc.Color(245, 66, 57),
+    new cc.Color(198, 225, 72),
+    new cc.Color(242, 250, 252),
+    new cc.Color(244, 127, 60),
+    new cc.Color(200, 169, 92),
+    new cc.Color(242, 238, 235),
+    new cc.Color(252, 74, 61)
   ]
   private static readonly WATERMELON_ARR: number[] = [
     1,
@@ -69,6 +69,9 @@ export default class Game extends cc.Component {
   private bombFrame: cc.SpriteFrame = null
   @property(cc.AudioClip)
   private bombAudioClip: cc.AudioClip = null
+
+  private fruitsPool: cc.NodePool = new cc.NodePool()
+  private bombPool: cc.NodePool = new cc.NodePool()
 
   private gameMode: GameMode = GameMode.WATERMELON
   private gameState: GameState = GameState.PLAYING
@@ -285,7 +288,7 @@ export default class Game extends cc.Component {
   private generateFruitsIndex() {
     this.step++
     if (this.gameMode == GameMode.WATERMELON) {
-      // 生成合成大西瓜索引
+      // 生成合成大水果索引
       let index = Math.floor(Math.random() * Game.WATERMELON_ARR.length)
       if (this.step <= 2) {
         index = 0
@@ -316,10 +319,11 @@ export default class Game extends cc.Component {
       return
     }
 
-    let fruitsNode: cc.Node = cc.instantiate(this.fruitsPrefab)
+    let fruitsNode: cc.Node = this.createFruits()
     let fruitsSize = this.calculateFruitsSize(fruitsIndex)
     fruitsNode.width = fruitsSize
     fruitsNode.height = fruitsSize
+    fruitsNode.scale = 1
     fruitsNode.setPosition(position)
     fruitsNode.getComponent(cc.Sprite).spriteFrame = this.fruitsFrameArr[
       fruitsIndex
@@ -337,6 +341,24 @@ export default class Game extends cc.Component {
   }
 
   /**
+   * 使用对象池方式创建水果节点
+   */
+  private createFruits() {
+    let fruitsNode: cc.Node = this.fruitsPool.get()
+    if (fruitsNode == null) {
+      fruitsNode = cc.instantiate(this.fruitsPrefab)
+    }
+    return fruitsNode
+  }
+
+  /**
+   * 回收水果节点
+   */
+  private recycleFruits(fruits: FruitsComponent) {
+    this.fruitsPool.put(fruits.node)
+  }
+
+  /**
    * 合并成新的水果节点
    */
   composeFruits(fruits1: FruitsComponent, fruits2: FruitsComponent) {
@@ -344,8 +366,8 @@ export default class Game extends cc.Component {
       return
     }
 
-    fruits1.node.removeFromParent()
-    fruits2.node.removeFromParent()
+    this.recycleFruits(fruits1)
+    this.recycleFruits(fruits2)
 
     this.playBombSound()
     this.incrementScore(fruits1.fruitsIndex)
@@ -392,26 +414,42 @@ export default class Game extends cc.Component {
    * 添加爆炸节点并播放爆炸效果
    */
   private addBombNode(fruitsComponent: FruitsComponent) {
-    // 动态创建一个 Node
-    let bombNode: cc.Node = new cc.Node()
-    // 添加 Sprite 组件并设置爆炸的图片
-    let bombSprite: cc.Sprite = bombNode.addComponent(cc.Sprite)
-    bombSprite.spriteFrame = this.bombFrame
-    bombSprite.sizeMode = cc.Sprite.SizeMode.CUSTOM
-
+    let bombNode: cc.Node = this.createBombNode()
     bombNode.setPosition(fruitsComponent.node.getPosition())
     bombNode.width = fruitsComponent.node.width
     bombNode.height = fruitsComponent.node.width
     bombNode.scale = 0.9
-    bombNode.parent = this.node
     bombNode.color = Game.COLOR_ARR[fruitsComponent.fruitsIndex - 1]
+    bombNode.parent = this.node
 
     cc.tween(bombNode)
       .to(0.2, { scale: 1.3 })
       .call(() => {
-        bombNode.removeFromParent()
+        this.recycleBombNode(bombNode)
       })
       .start()
+  }
+
+  /**
+   * 使用对象池方式创建爆炸节点
+   */
+  private createBombNode() {
+    let bombNode: cc.Node = this.bombPool.get()
+    if (bombNode == null) {
+      bombNode = new cc.Node()
+      // 添加 Sprite 组件并设置爆炸的图片
+      let bombSprite: cc.Sprite = bombNode.addComponent(cc.Sprite)
+      bombSprite.spriteFrame = this.bombFrame
+      bombSprite.sizeMode = cc.Sprite.SizeMode.CUSTOM
+    }
+    return bombNode
+  }
+
+  /**
+   * 回收爆炸节点
+   */
+  private recycleBombNode(node: cc.Node) {
+    this.bombPool.put(node)
   }
 
   private playWinBomb(position: cc.Vec2, color: cc.Color) {
@@ -477,7 +515,7 @@ export default class Game extends cc.Component {
         }
 
         this.incrementScore(fruitsComponent.fruitsIndex)
-        fruitsComponent.node.removeFromParent()
+        this.recycleFruits(fruitsComponent)
       }, delayTime)
     }
 
@@ -513,6 +551,7 @@ export default class Game extends cc.Component {
 
     if (this.isAI) {
       this.scheduleOnce(() => {
+        this.unscheduleAllCallbacks()
         this.init()
         this.startAI()
       }, 2)
@@ -529,7 +568,7 @@ export default class Game extends cc.Component {
       if (!fruitsComponent || fruitsComponent.isHero) {
         continue
       }
-      fruitsComponent.node.removeFromParent()
+      this.recycleFruits(fruitsComponent)
     }
   }
 
@@ -537,9 +576,9 @@ export default class Game extends cc.Component {
     if (data === "switchGameMode") {
       if (this.gameMode == GameMode.WATERMELON) {
         this.gameMode = GameMode.SESAME
-        this.switchGameModeLabel.string = "大西瓜"
+        this.switchGameModeLabel.string = "大水果"
         this.titleLabel.string = this.titleLabel.string.replace(
-          "大西瓜",
+          "大水果",
           "小芝麻"
         )
       } else {
@@ -547,7 +586,7 @@ export default class Game extends cc.Component {
         this.switchGameModeLabel.string = "小芝麻"
         this.titleLabel.string = this.titleLabel.string.replace(
           "小芝麻",
-          "大西瓜"
+          "大水果"
         )
       }
       this.unscheduleAllCallbacks()
