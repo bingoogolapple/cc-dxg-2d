@@ -214,6 +214,7 @@ export default class Game extends cc.Component {
       return
     }
 
+    let anim = this.warningLineNode.getComponent(cc.Animation)
     let children = this.node.children
     for (let i = 0; i < children.length; i++) {
       let fruitsComponent = children[i].getComponent(FruitsComponent)
@@ -223,11 +224,17 @@ export default class Game extends cc.Component {
       let top = fruitsComponent.node.y + fruitsComponent.node.height / 2
       // 已经碰撞过其他水果 && 当前水果位置 > 警戒线位置 - 150
       if (fruitsComponent.isCollided && top > this.warningLineNode.y - 150) {
-        this.warningLineNode.active = true
+        if (!anim.getAnimationState(anim.defaultClip.name).isPlaying) {
+          anim.play(anim.defaultClip.name)
+        }
         return
       }
     }
-    this.warningLineNode.active = false
+
+    if (anim.getAnimationState(anim.defaultClip.name).isPlaying) {
+      anim.stop(anim.defaultClip.name)
+      this.warningLineNode.opacity = 30
+    }
   }
 
   /**
@@ -587,7 +594,6 @@ export default class Game extends cc.Component {
     this.hero1Node.active = false
     this.hero2Node.active = false
     this.hero3Node.active = false
-    this.warningLineNode.active = false
 
     // 所有水果节点播放爆炸动画并移除
     let bombTotalTime = 0
