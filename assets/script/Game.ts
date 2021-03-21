@@ -49,8 +49,12 @@ export default class Game extends cc.Component {
 
   @property(cc.Label)
   private switchGameModeLabel: cc.Label = null
+  @property(cc.Sprite)
+  private switchGameModeSprite: cc.Sprite = null
   @property(cc.Label)
   private switchAiLabel: cc.Label = null
+  @property(cc.Sprite)
+  private switchAiSprite: cc.Sprite = null
   @property(cc.Label)
   private titleLabel: cc.Label = null
   @property(cc.Label)
@@ -82,6 +86,9 @@ export default class Game extends cc.Component {
   private bombFrame: cc.SpriteFrame = null
   @property(cc.AudioClip)
   private bombAudioClip: cc.AudioClip = null
+
+  @property([cc.SpriteFrame])
+  private aiVideoFrameArr: cc.SpriteFrame[] = []
 
   private fruitsPool: cc.NodePool = new cc.NodePool()
   private bombPool: cc.NodePool = new cc.NodePool()
@@ -123,6 +130,8 @@ export default class Game extends cc.Component {
     }
     this.isAI = false
     this.switchAiLabel.string = "启动 AI"
+    this.switchAiSprite.spriteFrame = this.aiVideoFrameArr[0]
+
     this.unschedule(this.aiFunc)
   }
 
@@ -136,6 +145,7 @@ export default class Game extends cc.Component {
 
     this.isAI = true
     this.switchAiLabel.string = "停止 AI"
+    this.switchAiSprite.spriteFrame = this.aiVideoFrameArr[1]
 
     this.scheduleOnce(() => {
       this.aiFunc()
@@ -687,6 +697,7 @@ export default class Game extends cc.Component {
       if (this.gameMode == GameMode.WATERMELON) {
         this.gameMode = GameMode.SESAME
         this.switchGameModeLabel.string = "大水果"
+        this.switchGameModeSprite.spriteFrame = this.fruitsFrameArr[this.fruitsFrameArr.length - 1]
         this.titleLabel.string = this.titleLabel.string.replace(
           "大水果",
           "小芝麻"
@@ -694,6 +705,7 @@ export default class Game extends cc.Component {
       } else {
         this.gameMode = GameMode.WATERMELON
         this.switchGameModeLabel.string = "小芝麻"
+        this.switchGameModeSprite.spriteFrame = this.fruitsFrameArr[0]
         this.titleLabel.string = this.titleLabel.string.replace(
           "小芝麻",
           "大水果"

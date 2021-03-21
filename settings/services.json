@@ -1,6 +1,19 @@
 {
 	"game": {
-		"name": "未知游戏",
-		"appid": "UNKNOW"
-	}
+		"name": "cc-dxg-2d",
+		"appid": "663003052",
+		"cid": 0
+	},
+	"needExecNative": true,
+	"configs": [
+		{
+			"appid": "663003052",
+			"services": [
+				{
+					"service_id": "235",
+					"enable": true
+				}
+			]
+		}
+	]
 }
