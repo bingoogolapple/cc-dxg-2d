@@ -364,7 +364,7 @@ export default class Game extends cc.Component {
         .getComponent(FruitsComponent)
         .initHero(index, this.fruitsFrameArr[index])
 
-      this.hero3Node.getComponent(FruitsComponent).fruitsIndex
+      index = this.hero3Node.getComponent(FruitsComponent).fruitsIndex
       this.hero2Node
         .getComponent(FruitsComponent)
         .initHero(index, this.fruitsFrameArr[index])
