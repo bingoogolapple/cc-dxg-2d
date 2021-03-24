@@ -197,7 +197,7 @@ export default class WechatComponent extends cc.Component {
     this.showFooterAd(
       "格子",
       wx,
-      this.bannerAd,
+      this.gridAd,
       (screenWidth: number, screenHeight: number) => {
         this.gridAd = wx.createGridAd({
           adUnitId: "adunit-cfd25a57f0f18191",
@@ -345,6 +345,6 @@ export default class WechatComponent extends cc.Component {
   }
 
   private log(...data: any[]): void {
-    // console.log(...data)
+    console.log(...data)
   }
 }
