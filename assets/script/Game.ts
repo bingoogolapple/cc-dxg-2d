@@ -714,12 +714,12 @@ export default class Game extends cc.Component {
       this.unscheduleAllCallbacks()
       this.stopAI()
       this.init()
-      this.wechatComponent.showInterstitialAd()
+      this.wechatComponent.showInterstitialAd(true)
     } else if (data === "replay") {
       this.unscheduleAllCallbacks()
       this.stopAI()
       this.init()
-      this.wechatComponent.showInterstitialAd()
+      this.wechatComponent.showInterstitialAd(true)
     } else if (data === "switchAI") {
       if (this.isAI) {
         this.unscheduleAllCallbacks()
